@@ -75,7 +75,7 @@ async function init() {
         /**
          ** Flow
          **/
-        await mainFlow(sock, response);
+        await mainFlow(response, sock);
       }
     } catch (error) {
       /**
