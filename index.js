@@ -55,28 +55,32 @@ async function init() {
   /**
    ** Messages control
    **/
-  sock.ev.on("messages.upsert", async (response) => {
+  sock.ev.on("messages.upsert", async ({ messages }) => {
     try {
       /**
        ** Debug
        */
       if (debug) {
-        console.log(JSON.stringify(response, undefined, 2));
+        console.log(JSON.stringify(messages, undefined, 2));
       }
+
+      const m = messages[0];
 
       /**
        ** From User and is Notify and not Status Broadcast
        */
-      if (
-        !response.messages[0].key.fromMe &&
-        response.type === "notify" &&
-        response.messages[0].key.remoteJid != "status@broadcast"
-      ) {
-        /**
-         ** Flow
-         **/
-        await mainFlow(response, sock);
-      }
+      if (!m.message || m.key.remoteJid == "status@broadcast")
+        return; // ignore non-chat messagesq
+
+      /**
+       ** Flow
+       **/
+
+      const messageType = Object.keys(m.message)[0];
+
+      await mainFlow(m, messageType, sock);
+
+      // }
     } catch (error) {
       /**
        ** Send error message to Whatsapp Admin
@@ -88,7 +92,7 @@ async function init() {
               "*Error:* " +
               error +
               "\n\n*Request*:\n" +
-              JSON.stringify(response, undefined, 2),
+              JSON.stringify(messages, undefined, 2),
           });
         }
       } catch (error) {

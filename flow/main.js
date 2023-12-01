@@ -1,12 +1,30 @@
+export async function mainFlow(response, messageType, sock) {
+  if (response.key.fromMe) {
+    if (messageType === "extendedTextMessage") return;
 
+   
+  } else {
+    if (messageType === "conversation") {
+      const message = response.message.conversation;
 
-export async function mainFlow(response, sock) {
+      if (message.startsWith("@")) {
+        /*await sock.sendMessage(response.key.remoteJid, {
+        text: "Esto es una prueba de automatización.",
+      });*/
 
-    if(response.messages[0].message.conversation === undefined) {
-        return;
+        await sock.sendMessage("573186312380@s.whatsapp.net", {
+          text:
+            "El número: " +
+            response.key.remoteJid +
+            " te ha enviado el siguiente mensaje: " +
+            message,
+        });
+      }
     }
-    sock.sendMessage(response.messages[0].key.remoteJid, {
-        text: "Esto es una prueba de automatización."
-    });
-}
 
+    if (messageType === "imageMessage") {
+    }
+  }
+
+  console.log(response, "type:" + messageType);
+}
